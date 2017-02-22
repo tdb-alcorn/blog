@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>My Blog</title>
+        <script type="text/javascript">
+            function get(path) {
+                const req = new XMLHttpRequest();
+                const result = new Promise(function(resolve, reject) {
+                    req.addEventListener("load", function() {
+                        if (this.status >= 400) {
+                            reject(this);
+                            return;
+                        }
+                        resolve(this.responseText);
+                    });
+                });
+                req.open("GET", path);
+                req.send();
+                return result;
+            }
+            function loadSelectedPost() {
+                const post = document.getElementById("select-post").value;
+                get("/posts/" + post)
+                .then(function(post) {
+                    const content = document.getElementById("content");
+                    content.innerHTML = post;
+                })
+                .catch(function(err) {
+                    console.log(err)
+                });
+            }
+            function populatePosts() {
+                get("/posts")
+                .then(function(posts) {
+                    posts = JSON.parse(posts);
+                    posts.sort(function(a, b) {
+                        return a["ts"]+a["name"] > b["ts"]+b["name"] ? -1 : 1;
+                    });
+                    setOptions(posts.map(function(p) {
+                            return decodeURIComponent(p["ts"] + "_" + p["name"]);
+                        }), document.getElementById("select-post"));
+                })
+                .then(loadSelectedPost)
+                .catch(function(err) {
+                    console.log(err);
+                });
+            }
+            function setOptions(options, elt) {
+                let option;
+                for (let i=0, len=options.length; i<len; i++) {
+                    option = document.createElement("option");
+                    option.text = options[i];
+                    option.value = options[i];
+                    if (i === 0) {
+                        option.selected = "selected";
+                    }
+                    elt.add(option);
+                }
+            }
+        </script>
+    </head>
+    <body onload="populatePosts();">
+        <div id="container">
+            <h1>Das Blog</h1>
+            <select id="select-post" name="Posts" onchange="loadSelectedPost();"></select>
+            <div id="content">
+            </div>
+        </div>
+    </body>
+</html>
