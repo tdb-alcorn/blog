@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# blog - this script starts my blog as a daemon
+#
+# chkconfig: 23 86 14
+# description: My blog is an HTTP server running on NodeJS.
+# processname: blog
+# config: /etc/sysconfig/blog
+# pidfile: /var/run/blog.pid
+#
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+node="/usr/bin/node"
+prog="blog"
+
+# Source app configuration
+[ -f "/etc/sysconfig/$prog" ] && . /etc/sysconfig/$prog
+
+pidfile="/var/run/${prog}.pid"
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $node /usr/share/blog/server.js 
+    retval=$?
+    echo
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p $pidfile $prof
+    retval=$?
+    echo
+    return $retval
+}
+
+case "$1" in
+    start|stop)
+        $1
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 2
+esac
+        

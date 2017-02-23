@@ -5,6 +5,7 @@ const Router = require("nice-router");
 
 const log = new Logger("blog", "debug");
 const router = new Router();
+// router.setLogLevel("debug");
 
 // router.useHTTPS({
 //     key: fs.readFileSync(process.env["SSL_KEY"] || "/etc/secrets/key.pem");
