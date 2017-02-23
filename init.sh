@@ -14,19 +14,19 @@ fi
 curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
 yum -y install nodejs
 
-[ ! -d "/data" ] || mkdir /data
-[ ! -d "/data/www" ] || mkdir /data/www
-[ ! -d "/usr/share/blog" ] || mkdir /usr/share/blog
+[ -d "/data" ] || mkdir /data
+[ -d "/data/www" ] || mkdir /data/www
+[ -d "/usr/share/blog" ] || mkdir /usr/share/blog
+[ -d "/var/log/blog" ] || mkdir /var/log/blog
 
 pushd $APP_DIR
     # install init.d script
-    cp blog /etc/init.d/blog
-    cp blog.conf /etc/nginx/conf.d/
-    # move static assets
-    mv index.html /data/www
-    mv assets /data/www
-    # move app files
-    cp -r . /usr/share/blog
+    cp -f blog /etc/init.d/
+    # install nginx configuration
+    cp -f nginx.conf /etc/nginx/
+    cp -f blog.conf /etc/nginx/conf.d/
+    # install app files
+    cp -rf . /usr/share/blog
     pushd /usr/share/blog
         # install app
         npm install --production
